@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Web Components Collection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f5ff; /* Light lavender background */
+        }
+        
+        .section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            border-radius: 1rem; /* Rounded corners for sections */
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Subtle shadow */
+        }
+        .nav-link{
+          display: inline-block;
+          padding: 0.5rem 1rem;
+          font-size: 0.875rem; /* 14px */
+          color: #4f46e5;       /* Indigo-600 */
+          background-color: #e0e7ff; /* Indigo-100 */
+          border-radius: 9999px; /* Pill shape */
+          text-decoration: none;
+          transition: background-color 0.2s;
+        }
+
+        .nav-link:hover {
+            background-color: #c7d2fe; /* Indigo-200 */
+        } 
+
+        .card {
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); /* Enhanced shadow on hover */
+        }
+        
+        .heart-icon, .like-btn { /* For book favorites and movie likes */
+            transition: all 0.2s ease;
+        }
+        
+        .heart-icon:hover, .like-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        .heart-icon.favorited, .like-btn.liked { /* Active state for favorite/like */
+            color: #e53e3e; /* Red-600 */
+            fill: #e53e3e; /* Red-600 for SVG fill */
+        }
+        
+        /* General active state for filter buttons */
+        .genre-btn.active, 
+        .category-btn.active, 
+        .region-btn.active, 
+        .cuisine-btn.active,
+        #gifts .occasion-btn.active { /* Specificity for gift occasion buttons */
+            background-color: #6366f1; /* Indigo-500 */
+            color: white;
+        }
+        
+        /* Toggle switch styling */
+        .toggle-checkbox:checked {
+            /* right: 0; Tailwind handles this with transform for better animation */
+            border-color: #6366f1; /* Indigo-500 */
+        }
+        
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #6366f1; /* Indigo-500 */
+        }
+        
+        /* Movie card image zoom on hover */
+        .movie-card:hover .zoom-img {
+            transform: scale(1.1);
+        }
+        
+        .zoom-img {
+            transition: transform 0.3s ease;
+        }
+        
+        /* Wishlist and Outfit item cursor */
+        .wishlist-item, .outfit-item {
+            cursor: grab;
+        }
+        .wishlist-item:active, .outfit-item:active {
+            cursor: grabbing;
+        }
+        
+        .dragging { /* Class applied to item being dragged */
+            opacity: 0.5;
+        }
+
+        .drag-over { /* Style for the drop zone when an item is dragged over it */
+            outline: 3px dashed #4f46e5; /* Indigo-600 */
+            background-color: #f0f2ff; /* Lighter Indigo */
+        }
+        
+        /* Emoji reaction styling */
+        .emoji-reaction {
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .emoji-reaction:hover {
+            transform: scale(1.2);
+        }
+        
+        .emoji-reaction.selected { /* If we want a selected state for emojis */
+            background-color: #e5e7eb; /* Gray-200 */
+            transform: scale(1.1);
+        }
+        
+        /* Star rating styling */
+        .star {
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .star:hover, .star.active { /* Active state for stars */
+            color: #f59e0b; /* Amber-500 */
+        }
+        
+        /* Swipe card base style */
+        .swipe-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease, opacity 0.5s ease; /* Smoother transition */
+            will-change: transform, opacity; /* Performance hint */
+            cursor: grab;
+        }
+        .swipe-card:active {
+            cursor: grabbing;
+        }
+        
+        /* Gift tag styling */
+        #gifts .gift-tag { /* Specificity for gift tags */
+            transition: all 0.2s ease;
+        }
+        
+        #gifts .gift-tag:hover {
+            background-color: #c7d2fe; /* Indigo-200 */
+            /* color: white; */ /* Keep text dark for better contrast on light bg */
+        }
+        
+        #gifts .gift-tag.selected { /* Active state for gift tags */
+            background-color: #6366f1; /* Indigo-500 */
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl sm:text-5xl font-bold text-indigo-700">Interactive Web Components</h1>
+            <p class="text-lg text-gray-600 mt-2">A curated collection of dynamic UI elements</p>
+        </header>
+        
+        <nav class="mb-10">
+            <ul class="flex flex-wrap justify-center gap-3 sm:gap-4">
+                <li><a href="#books" class="nav-link">Books</a></li>
+                <li><a href="#activities" class="nav-link">Activities</a></li>
+                <li><a href="#movies" class="nav-link">Movies</a></li>
+                <li><a href="#wishlist" class="nav-link">Wishlist</a></li>
+                <li><a href="#restaurants" class="nav-link">Restaurants</a></li>
+                <li><a href="#travel" class="nav-link">Travel</a></li>
+                <li><a href="#recommender" class="nav-link">Recommender</a></li>
+                <li><a href="#gifts" class="nav-link">Gifts</a></li>
+                <li><a href="#overlap" class="nav-link">Overlap Map</a></li>
+                <li><a href="#outfits" class="nav-link">Outfits</a></li>
+            </ul>
+        </nav>
+        
+        <section id="books" class="section">
+            <style>
+              /* Styles specific to Book List section to avoid global conflicts if needed */
+              /* #books .section { padding: 2rem; } Example of scoping if needed */
+              .book-heading { font-size: 1.5rem; font-weight: bold; color: #3730a3; margin-bottom: 1.5rem; }
+            
+              .filter-controls { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+              @media (min-width: 768px) {
+                .filter-controls { flex-direction: row; justify-content: space-between; align-items: center; }
+              }
+            
+              #books .genre-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; } /* Scoped to #books */
+              #books .genre-btn { /* Scoped to #books */
+                padding: 0.5rem 1rem; border-radius: 9999px; background: #e0e7ff; color: #3a358a;
+                font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s, color 0.2s; /* Added color transition */
+              }
+              #books .genre-btn:hover { background: #c7d2fe; } /* Keep hover consistent with other buttons */
+              /* #books .genre-btn.active is handled by global .active style */
+            
+            
+              .favorites-toggle { display: flex; align-items: center; gap: 0.75rem; }
+              .favorites-label { color: #374151; font-weight: 500; }
+              .toggle-wrapper { position: relative; width: 3rem; height: 1.5rem; }
+              #books .toggle-checkbox { /* Scoped to #books */
+                position: absolute; width: 1.5rem; height: 1.5rem; background: white;
+                border-radius: 9999px; appearance: none; cursor: pointer; transition: transform 0.2s, border-color 0.2s; /* Added border-color transition */
+                border: 2px solid #d1d5db; /* Added default border */
+                left: 0; /* Ensure it starts left */
+              }
+              #books .toggle-label { /* Scoped to #books */
+                display: block; width: 100%; height: 100%; background: #d1d5db; border-radius: 9999px; cursor: pointer;
+                transition: background-color 0.2s;
+              }
+              #books .toggle-checkbox:checked { /* Scoped to #books */
+                  transform: translateX(1.5rem);
+                  /* border-color handled by global .toggle-checkbox:checked */
+              }
+              /* #books .toggle-checkbox:checked + .toggle-label is handled by global */
+            </style>
+            
+              <h2 class="book-heading">Book List with Genre Filter and Favorites Toggle</h2>
+            
+              <div class="filter-controls">
+                <div class="genre-buttons">
+                  <button class="genre-btn active" data-genre="all">All Books</button>
+                  <button class="genre-btn" data-genre="fiction">Fiction</button>
+                  <button class="genre-btn" data-genre="mystery">Mystery</button>
+                  <button class="genre-btn" data-genre="fantasy">Fantasy</button>
+                  <button class="genre-btn" data-genre="sci-fi">Sci-Fi</button>
+                  <button class="genre-btn" data-genre="non-fiction">Non-Fiction</button>
+                </div>
+            
+                <div class="favorites-toggle">
+                  <span class="favorites-label">Show favorites only</span>
+                  <div class="toggle-wrapper">
+                    <input type="checkbox" id="favorites-toggle" class="toggle-checkbox" />
+                    <label for="favorites-toggle" class="toggle-label"></label>
+                  </div>
+                </div>
+              </div>
+                        
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="book-container">
+                </div>
+        </section>
+        
+        <section id="activities" class="section">
+            <style>
+                /* Styles specific to Activities section */
+                #activities .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #3730a3; }
+                #activities .category-section { margin-bottom: 1.5rem; }
+                #activities .category-heading { font-size: 1.125rem; font-weight: 500; margin-bottom: 0.75rem; }
+                #activities .category-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+                #activities .category-btn {
+                  padding: 0.5rem 1rem; border-radius: 9999px;
+                  background: #e0e7ff; color: #3730a3;
+                  font-weight: 500; cursor: pointer; border: none;
+                  transition: background-color 0.2s, color 0.2s;
+                }
+                #activities .category-btn:hover { background: #c7d2fe; }
+                /* #activities .category-btn.active handled by global */
+                #activities .generate-button-container { display: flex; justify-content: center; margin-bottom: 2rem; }
+                #activities .generate-button {
+                  padding: 0.75rem 1.5rem; background: #4f46e5; color: #fff;
+                  font-weight: 500; border-radius: 0.5rem; border: none;
+                  cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+                  transition: background-color 0.2s, box-shadow 0.2s;
+                }
+                #activities .generate-button:hover { background: #4338ca; }
+                #activities .activity-result {
+                  background: #eef2ff; padding: 1.5rem; border-radius: 1rem; /* Lighter background */
+                  text-align: center;
+                }
+                #activities .activity-result.hidden { display: none; }
+                #activities .activity-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: #3730a3; }
+                #activities .activity-description { color: #4b5563; margin-bottom: 1rem; }
+                #activities .activity-category {
+                  display: inline-block; padding: 0.25rem 0.75rem;
+                  background: #e0e7ff; color: #3730a3;
+                  border-radius: 9999px; font-size: 0.875rem; font-weight: 500;
+                }
+            </style>
+            
+            <h2 class="section-title">Random Activity Generator</h2>
+            
+            <div class="category-section">
+                <h3 class="category-heading">Select Categories:</h3>
+                <div class="category-buttons">
+                  <button class="category-btn active" data-category="all">All</button>
+                  <button class="category-btn" data-category="education">Education</button>
+                  <button class="category-btn" data-category="recreational">Recreational</button>
+                  <button class="category-btn" data-category="social">Social</button>
+                  <button class="category-btn" data-category="diy">DIY</button>
+                  <button class="category-btn" data-category="charity">Charity</button>
+                  <button class="category-btn" data-category="cooking">Cooking</button>
+                  <button class="category-btn" data-category="relaxation">Relaxation</button>
+                  <button class="category-btn" data-category="music">Music</button>
+                </div>
+            </div>
+            
+            <div class="generate-button-container">
+                <button id="generate-activity" class="generate-button">Generate Activity</button>
+            </div>
+            
+            <div id="activity-result" class="activity-result hidden">
+                <h3 id="activity-title" class="activity-title"></h3>
+                <p id="activity-description" class="activity-description"></p>
+                <span id="activity-category" class="activity-category"></span>
+            </div>
+        </section>
+        
+        <section id="movies" class="section">
+            <style>
+                /* Styles specific to Movies section */
+                #movies h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #3730a3; }
+                .movie-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+                @media(min-width:640px){.movie-grid{grid-template-columns:repeat(2,1fr);}}
+                @media(min-width:1024px){.movie-grid{grid-template-columns:repeat(3,1fr);}}
+                /* Removed Wishlist specific styles from here as they are in the Wishlist section */
+            </style>
+            
+            <h2>Movie Collection</h2>
+            <div class="movie-grid" id="movie-container">
+                </div>
+        </section>
+        
+        <section id="wishlist" class="section">
+            <style>
+                /* Styles specific to Wishlist section */
+                #wishlist h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #3730a3; }
+                .wishlist-info { color: #4b5563; margin-bottom: 1rem; } /* Adjusted color */
+                .wishlist-box { background: #eef2ff; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; }
+                .wishlist-input-group { display: flex; flex-direction: column; gap: 1rem; }
+                @media(min-width:768px){.wishlist-input-group{flex-direction:row;}}
+                .wishlist-input { flex: 1; padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; outline: none; 
+                                  transition: border-color 0.2s, box-shadow 0.2s; } /* Added transition */
+                .wishlist-input:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5); } /* Adjusted focus shadow */
+                .wishlist-add-btn { padding: 0.5rem 1.5rem; background: #4f46e5; color: #fff; font-weight: 500; border: none; border-radius: 0.5rem; cursor: pointer; transition: background-color 0.2s; }
+                .wishlist-add-btn:hover { background: #4338ca; }
+                .wishlist-list { display: flex; flex-direction: column; gap: 0.75rem; }
+                 /* .wishlist-item defined globally now */
+            </style>
+            <h2>My Wishlist</h2>
+            <p class="wishlist-info">Drag items to reorder by priority</p>
+            <div class="wishlist-box">
+                <div class="wishlist-input-group">
+                  <input type="text" id="wishlist-item-input" placeholder="Add new item..." class="wishlist-input">
+                  <button id="add-wishlist-item" class="wishlist-add-btn">Add Item</button>
+                </div>
+            </div>
+            <ul id="wishlist-items" class="wishlist-list">
+                </ul>
+        </section>
+        
+        <section id="restaurants" class="section">
+            <style>
+                /* Styles specific to Restaurants section */
+                #restaurants h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #3730a3; }
+                #restaurants h3 { font-size: 1.125rem; font-weight: 500; margin-bottom: 0.75rem; }
+                #restaurants .btn-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+                #restaurants .cuisine-btn {
+                  padding: 0.5rem 1rem; border-radius: 9999px;
+                  background: #e0e7ff; color: #3730a3; font-weight: 500;
+                  cursor: pointer; border: none; transition: background-color 0.2s, color 0.2s;
+                }
+                #restaurants .cuisine-btn:hover { background: #c7d2fe; }
+                /* #restaurants .cuisine-btn.active handled by global */
+                .restaurant-grid {
+                  display: grid; grid-template-columns: 1fr; gap: 1.5rem;
+                }
+                @media(min-width:768px){.restaurant-grid{grid-template-columns:repeat(2,1fr);}}
+                @media(min-width:1024px){.restaurant-grid{grid-template-columns:repeat(3,1fr);}}
+            </style>
+            
+            <h2>Restaurant Recommender</h2>
+            
+            <div>
+                <h3>Filter by Cuisine:</h3>
+                <div class="btn-group">
+                  <button class="cuisine-btn active" data-cuisine="all">All Cuisines</button>
+                  <button class="cuisine-btn" data-cuisine="italian">Italian</button>
+                  <button class="cuisine-btn" data-cuisine="japanese">Japanese</button>
+                  <button class="cuisine-btn" data-cuisine="mexican">Mexican</button>
+                  <button class="cuisine-btn" data-cuisine="indian">Indian</button>
+                  <button class="cuisine-btn" data-cuisine="thai">Thai</button>
+                </div>
+            </div>
+            
+            <div class="restaurant-grid" id="restaurant-container">
+                </div>
+        </section>
+        
+        <section id="travel" class="section">
+            <style>
+                /* Styles specific to Travel section */
+                #travel h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #3730a3; }
+                #travel h3 { font-size: 1.125rem; font-weight: 500; margin-bottom: 0.75rem; }
+                #travel .btn-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+                #travel .region-btn {
+                  padding: 0.5rem 1rem; border-radius: 9999px;
+                  background: #e0e7ff; color: #3730a3; font-weight: 500;
+                  cursor: pointer; border: none; transition: background-color 0.2s, color 0.2s;
+                }
+                #travel .region-btn:hover { background: #c7d2fe; }
+                /* #travel .region-btn.active handled by global */
+                .travel-grid {
+                  display: grid; grid-template-columns: 1fr; gap: 1.5rem;
+                }
+                @media(min-width:640px){.travel-grid{grid-template-columns:repeat(2,1fr);}}
+                @media(min-width:1024px){.travel-grid{grid-template-columns:repeat(3,1fr);}}
+            </style>
+            
+            <h2>Travel Idea Wall</h2>
+            
+            <div>
+                <h3>Filter by Region:</h3>
+                <div class="btn-group">
+                  <button class="region-btn active" data-region="all">All Regions</button>
+                  <button class="region-btn" data-region="europe">Europe</button>
+                  <button class="region-btn" data-region="asia">Asia</button>
+                  <button class="region-btn" data-region="north-america">North America</button>
+                  <button class="region-btn" data-region="south-america">South America</button>
+                  <button class="region-btn" data-region="africa">Africa</button>
+                  <button class="region-btn" data-region="oceania">Oceania</button>
+                </div>
+            </div>
+            
+            <div class="travel-grid" id="travel-container">
+                </div>
+        </section>
+        
+        <section id="recommender" class="section">
+            <style>
+                /* Styles specific to Recommender section */
+                #recommender h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #3730a3; }
+                #recommender p { color: #4b5563; margin-bottom: 1.5rem; }
+                .swipe-box { position: relative; height: 24rem; max-width: 20rem; /* Made slightly narrower */ margin: auto; overflow: hidden; /* Hide overflowing cards */ }
+                #swipe-container { position: relative; width: 100%; height: 100%; 
+                                   display: flex; align-items: center; justify-content: center; /* Center content */
+                }
+                /* swipe-card defined globally */
+                .swipe-controls { display: flex; justify-content: center; margin-top: 1.5rem; gap: 1rem; }
+                .swipe-btn {
+                  padding: 1rem; border-radius: 9999px; transition: background-color 0.2s;
+                  border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; /* Center icon */
+                }
+                #swipe-left { background: #fee2e2; color: #dc2626; } /* Red-100 bg, Red-600 text */
+                #swipe-left:hover { background: #fecaca; } /* Red-200 */
+                #swipe-right { background: #d1fae5; color: #16a34a; } /* Green-100 bg, Green-600 text */
+                #swipe-right:hover { background: #a7f3d0; } /* Green-200 */
+                #recommender svg { width: 1.5rem; height: 1.5rem; } /* Scoped SVG size */
+            </style>
+            
+            <h2>Swipe Recommender</h2>
+            <p>Swipe right if you like it, left if you don't</p>
+            
+            <div class="swipe-box">
+                <div id="swipe-container">
+                  </div>
+            </div>
+            
+            <div class="swipe-controls">
+                <button id="swipe-left" class="swipe-btn" aria-label="Swipe Left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                <button id="swipe-right" class="swipe-btn" aria-label="Swipe Right">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+        
+        <section id="gifts" class="section">
+            <style>
+                /* Styles specific to Gifts section */
+                #gifts h2 {
+                  font-size: 1.5rem;
+                  font-weight: 700;
+                  margin-bottom: 1.5rem;
+                  color: #3730a3;
+                }
+                #gifts h3 {
+                  font-size: 1.125rem;
+                  font-weight: 500;
+                  margin-bottom: 0.75rem;
+                }
+                #gifts .btn-group {
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 0.5rem;
+                  margin-bottom: 1.5rem;
+                }
+                #gifts .occasion-btn { /* Scoped button style */
+                  padding: 0.5rem 1rem;
+                  border-radius: 9999px;
+                  background: #e0e7ff;
+                  color: #3730a3;
+                  font-weight: 500;
+                  border: none;
+                  cursor: pointer;
+                  transition: background-color 0.2s, color 0.2s;
+                }
+                #gifts .occasion-btn:hover { background: #c7d2fe; }
+                /* #gifts .occasion-btn.active handled by global */
+            
+                /* #gifts .gift-tag defined globally */
+                /* #gifts .gift-tag:hover defined globally */
+                /* #gifts .gift-tag.selected defined globally */
+            
+                #gifts .center-btn {
+                  display: flex;
+                  justify-content: center;
+                  margin-bottom: 2rem;
+                }
+                #generate-gift {
+                  padding: 0.75rem 1.5rem;
+                  background: #4f46e5;
+                  color: #fff;
+                  font-weight: 500;
+                  border-radius: 0.5rem;
+                  transition: background-color 0.2s;
+                  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                  border: none;
+                  cursor: pointer;
+                }
+                #generate-gift:hover {
+                  background: #4338ca;
+                }
+                #gift-results {
+                  display: grid;
+                  gap: 1rem;
+                  /* display: none; Will be handled by JS if initially empty */
+                  grid-template-columns: 1fr;
+                }
+                @media(min-width:640px) { /* sm breakpoint */
+                  #gift-results {
+                    grid-template-columns: repeat(2, 1fr);
+                  }
+                }
+                @media(min-width:1024px) { /* lg breakpoint */
+                  #gift-results {
+                    grid-template-columns: repeat(3, 1fr);
+                  }
+                }
+            </style>
+            
+            <h2>Gift Idea Generator</h2>
+            
+            <div>
+                <h3>Select Occasion:</h3>
+                <div class="btn-group" id="occasion-select-buttons"> <button class="occasion-btn active" data-occasion="all">All</button> <button class="occasion-btn" data-occasion="birthday">Birthday</button>
+                  <button class="occasion-btn" data-occasion="anniversary">Anniversary</button>
+                  <button class="occasion-btn" data-occasion="wedding">Wedding</button>
+                  <button class="occasion-btn" data-occasion="graduation">Graduation</button>
+                  <button class="occasion-btn" data-occasion="holiday">Holiday</button>
+                </div>
+            
+                <h3>Select Tags:</h3>
+                <div class="btn-group" id="gift-tags-buttons"> <button class="gift-tag selected" data-tag="all">All Tags</button> <button class="gift-tag" data-tag="tech">Tech</button>
+                  <button class="gift-tag" data-tag="fashion">Fashion</button>
+                  <button class="gift-tag" data-tag="home">Home</button>
+                  <button class="gift-tag" data-tag="books">Books</button>
+                  <button class="gift-tag" data-tag="outdoors">Outdoors</button>
+                  <button class="gift-tag" data-tag="food">Food & Drink</button>
+                  <button class="gift-tag" data-tag="experience">Experience</button>
+                  <button class="gift-tag" data-tag="handmade">Handmade</button>
+                </div>
+            </div>
+            
+            <div class="center-btn">
+                <button id="generate-gift">Generate Gift Ideas</button>
+            </div>
+            
+            <div id="gift-results">
+                </div>
+        </section>
+        
+        <section id="overlap" class="section">
+            <style>
+                /* Styles specific to Overlap Map section */
+                #overlap h2 {
+                  font-size: 1.5rem;
+                  font-weight: 700;
+                  margin-bottom: 1.5rem;
+                  color: #3730a3;
+                }
+                #overlap h3 {
+                  font-size: 1.125rem;
+                  font-weight: 500;
+                  margin-bottom: 0.75rem;
+                }
+                #overlap p {
+                  color: #4b5563;
+                  margin-bottom: 1.5rem;
+                }
+                .flex-col-md-row {
+                  display: flex;
+                  flex-direction: column;
+                  gap: 1.5rem;
+                }
+                @media(min-width:768px) {
+                  .flex-col-md-row {
+                    flex-direction: row;
+                  }
+                }
+                .box {
+                  flex: 1;
+                  padding: 1rem;
+                  border-radius: 0.5rem;
+                  min-height: 200px;
+                }
+                #your-recs {
+                  background: #eef2ff; /* Indigo-50 */
+                }
+                #friend-recs {
+                  background: #fce7f3; /* Pink-50 */
+                }
+                #overlap-recs {
+                  background: #f3e8ff; /* Purple-50 */
+                }
+                #overlap ul { list-style: none; padding: 0; }
+                #overlap li { 
+                    background-color: rgba(255,255,255,0.7); 
+                    padding: 0.5rem; 
+                    margin-bottom: 0.5rem; 
+                    border-radius: 0.25rem;
+                    font-size: 0.875rem;
+                }
+            </style>
+            
+            <h2>Recommendation Overlap Map</h2>
+            <p>See how your recommendations compare with your friends'</p>
+            
+            <div class="flex-col-md-row">
+                <div class="box" id="your-recs">
+                  <h3>Your Recommendations</h3>
+                  <ul id="your-recs-list"></ul> </div>
+                <div class="box" id="friend-recs">
+                  <h3>Friend's Recommendations</h3>
+                  <ul id="friend-recs-list"></ul> </div>
+                <div class="box" id="overlap-recs">
+                  <h3>Overlap</h3>
+                  <ul id="overlap-recs-list"></ul> </div>
+            </div>
+        </section>
+        
+        <section id="outfits" class="section">
+            <style>
+              /* Styles specific to Outfit Builder section */
+              #outfits h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #3730a3; }
+              #outfits h3 { font-size: 1.125rem; font-weight: 500; margin-bottom: 0.75rem; }
+              #outfits > p { color: #4b5563; margin-bottom: 1.5rem; } /* Direct child p */
+              .flex-col-lg-row { display: flex; flex-direction: column; gap: 1.5rem; }
+              @media(min-width:1024px){ .flex-col-lg-row { flex-direction: row; } }
+              .lg-half { width: 100%; }
+              @media(min-width:1024px){ .lg-half { width: 50%; } }
+              #clothing-items { 
+                  display: grid; 
+                  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Responsive grid */
+                  gap: 1rem; 
+                  padding: 1rem; 
+                  border: 1px solid #e5e7eb; /* Gray-200 */
+                  border-radius: 0.5rem; /* Tailwind's rounded-lg */
+                  min-height: 200px; 
+                  background-color: #f9fafb; /* Gray-50 */
+                }
+              
+              #outfit-builder { /* This is the parent container for the outfit area */
+                background: #eef2ff; /* Indigo-50 */
+                padding: 1.5rem; 
+                border-radius: 0.5rem; /* Tailwind's rounded-lg */
+                min-height: 400px;
+                display: flex; flex-direction: column; 
+              }
+              #outfit-container { /* This is the actual drop zone grid */
+                display: grid; 
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Responsive grid */
+                gap: 1rem; 
+                min-height: 300px; 
+                flex-grow: 1; 
+                padding: 0.5rem; /* Padding inside drop zone */
+                border: 1px dashed #c7d2fe; /* Indigo-200 dashed border */
+                border-radius: 0.375rem; /* Tailwind's rounded-md */
+              }
+              #outfits .text-center { text-align: center; color: #6b7280; margin-bottom: 1rem; }
+              #outfits .mt-4 { margin-top: 1rem; }
+              #outfits .font-medium { font-weight: 500; }
+              /* .outfit-item, .dragging, .drag-over are defined globally now */
+              #outfits .outfit-item { /* Specificity for outfit items if needed, or rely on global */
+                  position: relative; /* For remove button positioning */
+              }
+              #outfits button { 
+                cursor: pointer;
+              }
+            </style>
+            
+            <h2>Outfit Builder</h2>
+            <p>Drag items to create your perfect outfit. Click the '×' to remove an item from the outfit.</p>
+            
+            <div class="flex-col-lg-row">
+              <div class="lg-half">
+                <h3>Clothing Items</h3>
+                <div id="clothing-items">
+                    </div>
+              </div>
+            
+              <div class="lg-half">
+                <h3>Your Outfit</h3>
+                <div id="outfit-builder">
+                  <div class="text-center text-gray-500" id="outfit-message">Drag items here to build your outfit</div>
+                  <div id="outfit-container">
+                      </div>
+                  <div class="mt-4 text-center">
+                    <p class="font-medium text-indigo-700">Outfit Score: <span id="outfit-score" class="text-xl">0</span>/100</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // --- Global Data Arrays ---
+        // Using 'global' prefix to emphasize they can be accessed by multiple IIFEs if needed,
+        // though each IIFE below mostly uses its own local copy or specific data.
+        const globalBooksData = [
+            { id: 1, title: "The Midnight Library", author: "Matt Haig", genre: "fiction", cover: `<svg class="w-full h-64 mb-3 rounded-lg object-cover" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#3949ab"/><circle cx="100" cy="100" r="50" fill="#5c6bc0"/><text x="50%" y="90%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="12" fill="#fff">The Midnight Library</text></svg>`, favorite: false },
+            { id: 2, title: "Project Hail Mary", author: "Andy Weir", genre: "sci-fi", cover: `<svg class="w-full h-64 mb-3 rounded-lg object-cover" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#212121"/><circle cx="100" cy="100" r="40" fill="#fdd835"/><text x="50%" y="90%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="12" fill="#fff">Project Hail Mary</text></svg>`, favorite: false },
+            { id: 3, title: "The Silent Patient", author: "Alex Michaelides", genre: "mystery", cover: `<svg class="w-full h-64 mb-3 rounded-lg object-cover" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#b71c1c"/><path d="M100,50 L150,150 L50,150 Z" fill="#ef5350"/><text x="50%" y="90%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="12" fill="#fff">The Silent Patient</text></svg>`, favorite: true },
+            { id: 4, title: "A Brief History of Time", author: "Stephen Hawking", genre: "non-fiction", cover: `<svg class="w-full h-64 mb-3 rounded-lg object-cover" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#004d40"/><circle cx="100" cy="100" r="60" fill="#00897b"/><text x="50%" y="90%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="10" fill="#fff">A Brief History of Time</text></svg>`, favorite: false },
+            { id: 5, title: "The Name of the Wind", author: "Patrick Rothfuss", genre: "fantasy", cover: `<svg class="w-full h-64 mb-3 rounded-lg object-cover" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#e65100"/><path d="M50,50 C100,30 120,70 150,50 C170,90 130,120 150,150 C100,170 80,130 50,150 C30,110 70,80 50,50 Z" fill="#ff9800"/><text x="50%" y="90%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="12" fill="#fff">Name of the Wind</text></svg>`, favorite: true },
+            { id: 6, title: "Gone Girl", author: "Gillian Flynn", genre: "mystery", cover: `<svg class="w-full h-64 mb-3 rounded-lg object-cover" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#263238"/><path d="M50,100 L150,100 L150,200 L50,200 Z" fill="#455a64"/><text x="50%" y="90%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="12" fill="#fff">Gone Girl</text></svg>`, favorite: false }
+        ];
+        
+        const globalMoviesData = [
+            { id: 1, title: "Inception", director: "Christopher Nolan", year: 2010, image: `<svg class="w-full h-48 rounded-t-lg zoom-img object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#1a237e"/><path d="M0,75 L200,75 L200,150 L0,150 Z" fill="#283593"/><path d="M50,50 L150,50 L150,100 L50,100 Z" fill="#3949ab" transform="rotate(45 100 75)"/><circle cx="100" cy="75" r="20" fill="#5c6bc0"/><text x="50%" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="12" fill="#fff">Inception</text></svg>`, liked: false },
+            { id: 2, title: "The Shawshank Redemption", director: "Frank Darabont", year: 1994, image: `<svg class="w-full h-48 rounded-t-lg zoom-img object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#37474f"/><rect x="80" y="20" width="40" height="110" fill="#546e7a"/><text x="50%" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="10" fill="#fff">Shawshank</text></svg>`, liked: true },
+            { id: 3, title: "Pulp Fiction", director: "Quentin Tarantino", year: 1994, image: `<svg class="w-full h-48 rounded-t-lg zoom-img object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#ffeb3b"/><rect x="20" y="20" width="160" height="110" fill="#fdd835"/><text x="50%" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="12" fill="#424242">Pulp Fiction</text></svg>`, liked: false },
+            { id: 4, title: "The Godfather", director: "Francis Ford Coppola", year: 1972, image: `<svg class="w-full h-48 rounded-t-lg zoom-img object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#3e2723"/><path d="M50,30 L150,30 L150,120 L50,120 Z" fill="#5d4037"/><text x="50%" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="12" fill="#fff">The Godfather</text></svg>`, liked: true },
+            { id: 5, title: "The Dark Knight", director: "Christopher Nolan", year: 2008, image: `<svg class="w-full h-48 rounded-t-lg zoom-img object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#212121"/><path d="M80,40 L120,40 L140,70 L100,110 L60,70 Z" fill="#424242"/><text x="50%" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="12" fill="#fff">Dark Knight</text></svg>`, liked: false },
+            { id: 6, title: "Fight Club", director: "David Fincher", year: 1999, image: `<svg class="w-full h-48 rounded-t-lg zoom-img object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#b71c1c"/><rect x="30" y="30" width="140" height="90" fill="#c62828"/><text x="50%" y="85%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="12" fill="#fff">Fight Club</text></svg>`, liked: false }
+        ];
+
+        // --- IIFE for each section to encapsulate its logic ---
+
+        // Book List with Genre Filter and Favorites Toggle
+        (function() {
+            const bookContainer = document.getElementById('book-container');
+            const genreButtons = document.querySelectorAll('#books .genre-btn');
+            const favoritesToggle = document.getElementById('favorites-toggle');
+
+            if (!bookContainer || !favoritesToggle || genreButtons.length === 0) {
+                console.warn("Book list elements not found, skipping initialization.");
+                return;
+            }
+
+            let currentGenre = 'all';
+            let showFavoritesOnly = false;
+
+            function renderBooks() {
+                bookContainer.innerHTML = ''; // Clear existing books
+                
+                const booksToDisplay = globalBooksData.filter(book => {
+                    const genreMatch = currentGenre === 'all' || book.genre === currentGenre;
+                    const favoriteMatch = !showFavoritesOnly || book.favorite;
+                    return genreMatch && favoriteMatch;
+                });
+
+                if (booksToDisplay.length === 0) {
+                    bookContainer.innerHTML = `<p class="col-span-full text-center text-gray-500">No books match your criteria.</p>`;
+                    return;
+                }
+                
+                booksToDisplay.forEach(book => {
+                    const bookCard = document.createElement('div');
+                    bookCard.className = 'card bg-white rounded-xl overflow-hidden shadow-lg p-4 flex flex-col justify-between'; // Added shadow-lg
+                    bookCard.dataset.id = book.id;
+                    bookCard.dataset.genre = book.genre;
+                    
+                    bookCard.innerHTML = `
+                        <div class="relative">
+                            ${book.cover}
+                            <button class="heart-icon absolute top-2 right-2 p-1 bg-white/70 rounded-full ${book.favorite ? 'favorited' : ''}" data-id="${book.id}" aria-label="Toggle Favorite">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="${book.favorite ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mt-2">${book.title}</h3>
+                            <p class="text-sm text-gray-600">${book.author}</p>
+                            <span class="inline-block mt-2 px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-medium capitalize">${book.genre}</span>
+                        </div>
+                    `;
+                    bookContainer.appendChild(bookCard);
+                });
+                
+                // Add event listeners after books are rendered
+                bookContainer.querySelectorAll('.heart-icon').forEach(icon => {
+                    icon.removeEventListener('click', toggleFavorite); 
+                    icon.addEventListener('click', toggleFavorite); 
+                });
+            }
+
+            function toggleFavorite(e) {
+                const button = e.currentTarget;
+                const bookId = parseInt(button.dataset.id);
+                const book = globalBooksData.find(b => b.id === bookId);
+                
+                if (book) {
+                    book.favorite = !book.favorite;
+                    // Update button appearance immediately for responsiveness
+                    button.classList.toggle('favorited', book.favorite);
+                    button.querySelector('svg').setAttribute('fill', book.favorite ? 'currentColor' : 'none');
+                    
+                    // If "Show favorites only" is checked, re-render to remove/add the card
+                    if (showFavoritesOnly) {
+                        renderBooks();
+                    }
+                }
+            }
+
+            function setActiveGenre(genre) {
+                genreButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.genre === genre);
+                });
+            }
+
+            genreButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentGenre = btn.dataset.genre;
+                    setActiveGenre(currentGenre);
+                    renderBooks();
+                });
+            });
+
+            favoritesToggle.addEventListener('change', () => {
+                showFavoritesOnly = favoritesToggle.checked;
+                renderBooks();
+            });
+
+            renderBooks(); // Initial render
+        })();
+
+        // Random Activity Generator with Categories
+        (function() {
+            const activitiesData = [
+                { title: "Learn a New Language", description: "Start learning a new language using a free app like Duolingo or Memrise.", category: "education" },
+                { title: "Go Hiking", description: "Find a local trail and spend some time in nature.", category: "recreational" },
+                { title: "Host a Game Night", description: "Invite friends over for board games and snacks.", category: "social" },
+                { title: "Upcycle Old Furniture", description: "Transform an old piece of furniture with paint or new hardware.", category: "diy" },
+                { title: "Volunteer at a Food Bank", description: "Help sort and distribute food to those in need in your community.", category: "charity" },
+                { title: "Try a New Recipe", description: "Find an interesting recipe online and cook something you've never made before.", category: "cooking" },
+                { title: "Practice Meditation", description: "Take 10 minutes to sit quietly and focus on your breathing.", category: "relaxation" },
+                { title: "Create a Playlist", description: "Make a themed playlist of your favorite songs or discover new music.", category: "music" }
+            ];
+
+            const categoryButtons = document.querySelectorAll('#activities .category-btn');
+            const generateActivityBtn = document.getElementById('generate-activity');
+            const activityResultEl = document.getElementById('activity-result');
+            const activityTitleEl = document.getElementById('activity-title');
+            const activityDescriptionEl = document.getElementById('activity-description');
+            const activityCategoryEl = document.getElementById('activity-category');
+
+            if (!generateActivityBtn || !activityResultEl || !activityTitleEl || !activityDescriptionEl || !activityCategoryEl || categoryButtons.length === 0) {
+                 console.warn("Activity generator elements not found, skipping initialization.");
+                return;
+            }
+
+            let currentActivityCategory = 'all';
+
+            function setActiveActivityCategory(category) {
+                categoryButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.category === category);
+                });
+            }
+
+            function generateRandomActivity() {
+                const filteredActivities = activitiesData.filter(activity => 
+                    currentActivityCategory === 'all' || activity.category === currentActivityCategory
+                );
+                
+                activityResultEl.classList.remove('hidden');
+                if (filteredActivities.length === 0) {
+                    activityTitleEl.textContent = "No activities found";
+                    activityDescriptionEl.textContent = "Try selecting a different category or 'All'.";
+                    activityCategoryEl.textContent = "";
+                    return;
+                }
+                
+                const randomIndex = Math.floor(Math.random() * filteredActivities.length);
+                const activity = filteredActivities[randomIndex];
+                
+                activityTitleEl.textContent = activity.title;
+                activityDescriptionEl.textContent = activity.description;
+                activityCategoryEl.textContent = activity.category;
+                activityCategoryEl.className = `activity-category capitalize px-3 py-1 bg-${activity.category === 'education' ? 'blue' : activity.category === 'recreational' ? 'green' : 'purple'}-100 text-${activity.category === 'education' ? 'blue' : activity.category === 'recreational' ? 'green' : 'purple'}-700 rounded-full text-xs font-medium`;
+
+            }
+
+            categoryButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentActivityCategory = btn.dataset.category;
+                    setActiveActivityCategory(currentActivityCategory);
+                });
+            });
+
+            generateActivityBtn.addEventListener('click', generateRandomActivity);
+        })();
+
+        // Movie Card List with Like Buttons and Hover Zoom
+        (function() {
+            const movieContainer = document.getElementById('movie-container');
+            if (!movieContainer) {
+                console.warn("Movie container not found, skipping initialization.");
+                return;
+            }
+
+            function renderMovies() {
+                movieContainer.innerHTML = ''; // Clear existing movies
+                
+                if (globalMoviesData.length === 0) {
+                    movieContainer.innerHTML = `<p class="col-span-full text-center text-gray-500">No movies to display.</p>`;
+                    return;
+                }
+
+                globalMoviesData.forEach(movie => {
+                    const movieCard = document.createElement('div');
+                    movieCard.className = 'movie-card bg-white rounded-lg overflow-hidden shadow-lg'; // Added shadow-lg
+                    
+                    movieCard.innerHTML = `
+                        <div class="relative overflow-hidden">
+                            ${movie.image}
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800">${movie.title}</h3>
+                                    <p class="text-sm text-gray-600">${movie.director} (${movie.year})</p>
+                                </div>
+                                <button class="like-btn p-1 ${movie.liked ? 'liked' : ''}" data-id="${movie.id}" aria-label="Toggle Like">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="${movie.liked ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    movieContainer.appendChild(movieCard);
+                });
+                
+                movieContainer.querySelectorAll('.like-btn').forEach(btn => {
+                    btn.removeEventListener('click', toggleMovieLike); 
+                    btn.addEventListener('click', toggleMovieLike);
+                });
+            }
+
+            function toggleMovieLike(e) {
+                const button = e.currentTarget;
+                const movieId = parseInt(button.dataset.id);
+                const movie = globalMoviesData.find(m => m.id === movieId);
+                
+                if (movie) {
+                    movie.liked = !movie.liked;
+                    button.classList.toggle('liked', movie.liked);
+                    button.querySelector('svg').setAttribute('fill', movie.liked ? 'currentColor' : 'none');
+                }
+            }
+            renderMovies(); // Initial render
+        })();
+
+        // Mini Wishlist with Drag-to-Prioritize
+        (function() {
+            const wishlistItemsStore = [ 
+                { id: 1, name: "New Laptop X1", priority: 1 },
+                { id: 2, name: "Wireless Headphones Pro", priority: 2 },
+                { id: 3, name: "Fitness Tracker Plus", priority: 3 }
+            ];
+
+            const wishlistContainerEl = document.getElementById('wishlist-items');
+            const wishlistInputEl = document.getElementById('wishlist-item-input');
+            const addWishlistItemBtnEl = document.getElementById('add-wishlist-item');
+
+            if (!wishlistContainerEl || !wishlistInputEl || !addWishlistItemBtnEl) {
+                console.warn("Wishlist elements not found, skipping initialization.");
+                return;
+            }
+
+            let draggedWishlistItem = null;
+
+            function renderWishlist() {
+                wishlistContainerEl.innerHTML = '';
+                
+                wishlistItemsStore.sort((a, b) => a.priority - b.priority).forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'wishlist-item bg-white p-3 rounded-lg shadow-sm flex justify-between items-center hover:shadow-md transition-shadow';
+                    li.dataset.id = item.id;
+                    li.draggable = true;
+                    
+                    li.innerHTML = `
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                            <span class="text-indigo-600 font-semibold mr-3">#${item.priority}</span>
+                            <span class="text-gray-700">${item.name}</span>
+                        </div>
+                        <button class="delete-wishlist-item text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition-colors" data-id="${item.id}" aria-label="Delete item">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    `;
+                    wishlistContainerEl.appendChild(li);
+                });
+                
+                // Add event listeners after rendering
+                wishlistContainerEl.querySelectorAll('.delete-wishlist-item').forEach(btn => {
+                    btn.removeEventListener('click', deleteWishlistItem);
+                    btn.addEventListener('click', deleteWishlistItem);
+                });
+                
+                wishlistContainerEl.querySelectorAll('.wishlist-item').forEach(item => {
+                    item.removeEventListener('dragstart', handleDragStartWishlist);
+                    item.addEventListener('dragstart', handleDragStartWishlist);
+                    item.removeEventListener('dragover', handleDragOverWishlist);
+                    item.addEventListener('dragover', handleDragOverWishlist);
+                    item.removeEventListener('drop', handleDropWishlist);
+                    item.addEventListener('drop', handleDropWishlist);
+                    item.removeEventListener('dragenter', handleDragEnterWishlist);
+                    item.addEventListener('dragenter', handleDragEnterWishlist);
+                    item.removeEventListener('dragleave', handleDragLeaveWishlist);
+                    item.addEventListener('dragleave', handleDragLeaveWishlist);
+                    item.removeEventListener('dragend', handleDragEndWishlist); 
+                    item.addEventListener('dragend', handleDragEndWishlist);
+                });
+            }
+
+            function addWishlistItem() {
+                const name = wishlistInputEl.value.trim();
+                if (name) {
+                    const newId = wishlistItemsStore.length > 0 ? Math.max(...wishlistItemsStore.map(item => item.id)) + 1 : 1;
+                    const newPriority = wishlistItemsStore.length > 0 ? Math.max(...wishlistItemsStore.map(item => item.priority)) + 1 : 1;
+                    
+                    wishlistItemsStore.push({ id: newId, name: name, priority: newPriority });
+                    wishlistInputEl.value = '';
+                    renderWishlist();
+                }
+            }
+
+            function deleteWishlistItem(e) {
+                const itemId = parseInt(e.currentTarget.dataset.id);
+                const index = wishlistItemsStore.findIndex(item => item.id === itemId);
+                
+                if (index !== -1) {
+                    const deletedPriority = wishlistItemsStore[index].priority;
+                    wishlistItemsStore.splice(index, 1);
+                    wishlistItemsStore.forEach(item => {
+                        if (item.priority > deletedPriority) item.priority--;
+                    });
+                    renderWishlist();
+                }
+            }
+
+            function handleDragStartWishlist(e) {
+                draggedWishlistItem = e.target;
+                e.target.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', e.target.dataset.id); 
+            }
+
+            function handleDragEndWishlist(e) {
+                e.target.classList.remove('dragging');
+                // Clean up any drag-over styles from all items
+                wishlistContainerEl.querySelectorAll('.wishlist-item.drag-over').forEach(item => item.classList.remove('drag-over'));
+            }
+
+            function handleDragOverWishlist(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            }
+
+            function handleDragEnterWishlist(e) {
+                const targetItem = e.target.closest('.wishlist-item');
+                if (targetItem && targetItem !== draggedWishlistItem) {
+                    targetItem.classList.add('drag-over'); 
+                }
+            }
+
+            function handleDragLeaveWishlist(e) {
+                const targetItem = e.target.closest('.wishlist-item');
+                if (targetItem) {
+                    targetItem.classList.remove('drag-over');
+                }
+            }
+
+            function handleDropWishlist(e) {
+                e.preventDefault();
+                const dropTarget = e.target.closest('.wishlist-item');
+                if (dropTarget) dropTarget.classList.remove('drag-over');
+
+                if (dropTarget && draggedWishlistItem && draggedWishlistItem !== dropTarget) {
+                    const draggedId = parseInt(draggedWishlistItem.dataset.id);
+                    const targetId = parseInt(dropTarget.dataset.id);
+                    
+                    const draggedItemObj = wishlistItemsStore.find(item => item.id === draggedId);
+                    const targetItemObj = wishlistItemsStore.find(item => item.id === targetId);
+                    
+                    if (draggedItemObj && targetItemObj) {
+                        const oldPriority = draggedItemObj.priority;
+                        const newPriority = targetItemObj.priority;
+                        
+                        // Adjust priorities of other items
+                        wishlistItemsStore.forEach(item => {
+                            if (item.id === draggedId) return; // Skip the dragged item itself
+                            if (oldPriority < newPriority) { // Dragged down
+                                if (item.priority > oldPriority && item.priority <= newPriority) {
+                                    item.priority--;
+                                }
+                            } else { // Dragged up
+                                if (item.priority >= newPriority && item.priority < oldPriority) {
+                                    item.priority++;
+                                }
+                            }
+                        });
+                        draggedItemObj.priority = newPriority;
+                        renderWishlist();
+                    }
+                }
+                if (draggedWishlistItem) draggedWishlistItem.classList.remove('dragging');
+                draggedWishlistItem = null;
+            }
+
+            addWishlistItemBtnEl.addEventListener('click', addWishlistItem);
+            wishlistInputEl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addWishlistItem();
+            });
+            renderWishlist(); // Initial render
+        })();
+
+        // Restaurant Recommender
+        (function() {
+            const restaurantsData = [
+                { id: 1, name: "Pasta Paradise", cuisine: "italian", description: "Authentic Italian pasta and wood-fired pizzas.", rating: 4.5, reactions: { '😋': 12, '👍': 25, '❤': 8, '😐': 2, '👎': 1 } },
+                { id: 2, name: "Sushi Sensation", cuisine: "japanese", description: "Fresh sushi and traditional Japanese dishes.", rating: 4.7, reactions: { '😋': 18, '👍': 30, '❤': 15, '😐': 1, '👎': 0 } },
+                { id: 3, name: "Taco Fiesta", cuisine: "mexican", description: "Vibrant Mexican street food and margaritas.", rating: 4.2, reactions: { '😋': 22, '👍': 15, '❤': 5, '😐': 3, '👎': 2 } },
+                { id: 4, name: "Curry House", cuisine: "indian", description: "Flavorful curries and tandoori specialties.", rating: 4.4, reactions: { '😋': 10, '👍': 20, '❤': 7, '😐': 1, '👎': 1 } },
+                { id: 5, name: "Bangkok Kitchen", cuisine: "thai", description: "Authentic Thai curries and noodle dishes.", rating: 4.3, reactions: { '😋': 16, '👍': 18, '❤': 9, '😐': 0, '👎': 0 } },
+                { id: 6, name: "Mamma Mia Pizzeria", cuisine: "italian", description: "Family-style Italian comfort food & best pizza.", rating: 4.1, reactions: { '😋': 9, '👍': 12, '❤': 4, '😐': 2, '👎': 1 } }
+            ];
+            const restaurantContainerEl = document.getElementById('restaurant-container');
+            const cuisineButtonsEl = document.querySelectorAll('#restaurants .cuisine-btn');
+            if(!restaurantContainerEl || cuisineButtonsEl.length === 0) {
+                console.warn("Restaurant recommender elements not found, skipping initialization.");
+                return;
+            }
+
+            let currentRestaurantCuisine = 'all';
+
+            function renderRestaurants() {
+                restaurantContainerEl.innerHTML = '';
+                const restaurantsToDisplay = restaurantsData.filter(restaurant => 
+                    currentRestaurantCuisine === 'all' || restaurant.cuisine === currentRestaurantCuisine
+                );
+
+                if (restaurantsToDisplay.length === 0) {
+                    restaurantContainerEl.innerHTML = `<p class="col-span-full text-center text-gray-500">No restaurants match your criteria.</p>`;
+                    return;
+                }
+
+                restaurantsToDisplay.forEach(restaurant => {
+                    const restaurantCard = document.createElement('div');
+                    restaurantCard.className = 'card bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow';
+                    
+                    const cuisineColors = {
+                        italian: { bg: '#ef9a9a', accent: '#ffcdd2' }, japanese: { bg: '#90caf9', accent: '#bbdefb' },
+                        mexican: { bg: '#a5d6a7', accent: '#c8e6c9' }, indian: { bg: '#ffcc80', accent: '#ffe0b2' },
+                        thai: { bg: '#ce93d8', accent: '#e1bee7' }, default: {bg: '#e0e0e0', accent: '#f5f5f5'}
+                    };
+                    const color = cuisineColors[restaurant.cuisine] || cuisineColors.default;
+                    const svgImage = `<svg class="w-full h-40 object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="200" height="150" fill="${color.bg}"/>
+                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="16" fill="${color.accent}" opacity="0.8" class="capitalize">${restaurant.cuisine}</text>
+                    </svg>`;
+                    
+                    let starsHTML = '';
+                    for (let i = 0; i < 5; i++) {
+                        starsHTML += `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ${i < Math.round(restaurant.rating) ? 'text-yellow-400' : 'text-gray-300'}" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>`;
+                    }
+                    
+                    let reactionsHTML = '';
+                    for (const [emoji, count] of Object.entries(restaurant.reactions)) {
+                        reactionsHTML += `<button class="emoji-reaction px-2 py-1 rounded-full text-lg hover:bg-gray-200 transition-colors" data-restaurant="${restaurant.id}" data-emoji="${emoji}" aria-label="React with ${emoji}">
+                                ${emoji} <span class="text-xs ml-1 text-gray-600">${count}</span>
+                            </button>`;
+                    }
+                    
+                    restaurantCard.innerHTML = `
+                        ${svgImage}
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold text-gray-800">${restaurant.name}</h3>
+                            <p class="text-sm text-gray-600 mb-2 h-10 overflow-hidden">${restaurant.description}</p>
+                            <div class="flex items-center mb-3">
+                                ${starsHTML}
+                                <span class="ml-2 text-sm text-gray-600">(${restaurant.rating.toFixed(1)})</span>
+                            </div>
+                            <span class="inline-block mb-3 px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-medium capitalize">${restaurant.cuisine}</span>
+                            <div class="flex flex-wrap gap-1 items-center">
+                                ${reactionsHTML}
+                            </div>
+                        </div>`;
+                    restaurantContainerEl.appendChild(restaurantCard);
+                });
+                
+                restaurantContainerEl.querySelectorAll('.emoji-reaction').forEach(btn => {
+                    btn.removeEventListener('click', handleEmojiReaction);
+                    btn.addEventListener('click', handleEmojiReaction);
+                });
+            }
+
+            function setActiveRestaurantCuisine(cuisine) {
+                cuisineButtonsEl.forEach(btn => btn.classList.toggle('active', btn.dataset.cuisine === cuisine));
+            }
+
+            function handleEmojiReaction(e) {
+                const button = e.currentTarget;
+                const restaurantId = parseInt(button.dataset.restaurant);
+                const emoji = button.dataset.emoji;
+                const restaurant = restaurantsData.find(r => r.id === restaurantId);
+                if (restaurant) {
+                    // Basic toggle: if already reacted, remove reaction (optional)
+                    // For simplicity, just increment.
+                    restaurant.reactions[emoji]++;
+                    // Update count display directly for responsiveness
+                    button.querySelector('span').textContent = restaurant.reactions[emoji];
+                    // Could re-render all, but direct update is faster for just one reaction.
+                    // renderRestaurants(); 
+                }
+            }
+
+            cuisineButtonsEl.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentRestaurantCuisine = btn.dataset.cuisine;
+                    setActiveRestaurantCuisine(currentRestaurantCuisine);
+                    renderRestaurants();
+                });
+            });
+            renderRestaurants(); // Initial render
+        })();
+
+        // Travel Idea Wall
+        (function() {
+            const travelIdeasData = [
+                { id: 1, destination: "Paris, France", description: "Explore the City of Light, its iconic Eiffel Tower, world-class museums like the Louvre, and charming Montmartre.", region: "europe", image: `<svg class="w-full h-48 rounded-t-lg object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#81d4fa"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="20" fill="#01579b">Paris</text></svg>`, rating: 0 },
+                { id: 2, destination: "Kyoto, Japan", description: "Experience traditional Japanese culture among ancient temples, serene gardens, and geisha districts.", region: "asia", image: `<svg class="w-full h-48 rounded-t-lg object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#ffccbc"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="20" fill="#d84315">Kyoto</text></svg>`, rating: 0 },
+                { id: 3, destination: "New York City, USA", description: "Discover the Big Apple with its iconic skyline, Broadway shows, diverse neighborhoods, and Central Park.", region: "north-america", image: `<svg class="w-full h-48 rounded-t-lg object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#c5cae9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="20" fill="#303f9f">NYC</text></svg>`, rating: 0 },
+                { id: 4, destination: "Rome, Italy", description: "Walk through history visiting the Colosseum, Roman Forum, Vatican City, and enjoy delicious Italian cuisine.", region: "europe", image: `<svg class="w-full h-48 rounded-t-lg object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#ffe082"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="20" fill="#ff8f00">Rome</text></svg>`, rating: 0 },
+                { id: 5, destination: "Cape Town, South Africa", description: "Marvel at Table Mountain, explore beautiful coastlines, and experience diverse cultures.", region: "africa", image: `<svg class="w-full h-48 rounded-t-lg object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#a5d6a7"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="18" fill="#2e7d32">Cape Town</text></svg>`, rating: 0 },
+                { id: 6, destination: "Sydney, Australia", description: "Visit the iconic Opera House, Harbour Bridge, and enjoy the famous Bondi Beach.", region: "oceania", image: `<svg class="w-full h-48 rounded-t-lg object-cover" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="150" fill="#b3e5fc"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="20" fill="#0277bd">Sydney</text></svg>`, rating: 0 }
+            ];
+            const travelContainerEl = document.getElementById('travel-container');
+            const regionButtonsEl = document.querySelectorAll('#travel .region-btn');
+            if(!travelContainerEl || regionButtonsEl.length === 0) {
+                console.warn("Travel idea wall elements not found, skipping initialization.");
+                return;
+            }
+
+            let currentTravelRegion = 'all';
+
+            function renderTravelIdeas() {
+                travelContainerEl.innerHTML = '';
+                const ideasToDisplay = travelIdeasData.filter(idea => 
+                    currentTravelRegion === 'all' || idea.region === currentTravelRegion
+                );
+
+                if (ideasToDisplay.length === 0) {
+                    travelContainerEl.innerHTML = `<p class="col-span-full text-center text-gray-500">No travel ideas match your criteria.</p>`;
+                    return;
+                }
+
+                ideasToDisplay.forEach(idea => {
+                    const travelCard = document.createElement('div');
+                    travelCard.className = 'card bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col';
+                    let starsHTML = '';
+                    for (let i = 1; i <= 5; i++) {
+                        starsHTML += `<span class="star ${i <= idea.rating ? 'active text-yellow-400' : 'text-gray-300'}" data-idea="${idea.id}" data-rating="${i}" aria-label="Rate ${i} star">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg></span>`;
+                    }
+                    travelCard.innerHTML = `
+                        ${idea.image}
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h3 class="text-lg font-semibold text-gray-800">${idea.destination}</h3>
+                            <p class="text-sm text-gray-600 mb-3 flex-grow h-20 overflow-y-auto">${idea.description}</p>
+                            <span class="inline-block mb-3 px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-medium capitalize self-start">${idea.region}</span>
+                            <div class="flex mt-auto">
+                                ${starsHTML}
+                            </div>
+                        </div>`;
+                    travelContainerEl.appendChild(travelCard);
+                });
+                travelContainerEl.querySelectorAll('.star').forEach(star => {
+                    star.removeEventListener('click', handleStarRating);
+                    star.addEventListener('click', handleStarRating);
+                });
+            }
+
+            function setActiveTravelRegion(region) {
+                regionButtonsEl.forEach(btn => btn.classList.toggle('active', btn.dataset.region === region));
+            }
+
+            function handleStarRating(e) {
+                const starEl = e.currentTarget;
+                const ideaId = parseInt(starEl.dataset.idea);
+                const rating = parseInt(starEl.dataset.rating);
+                const idea = travelIdeasData.find(idea => idea.id === ideaId);
+                if (idea) {
+                    idea.rating = rating;
+                    // Update stars for this card directly for better UX before full re-render
+                    const parentCardStars = starEl.parentElement.children;
+                    for(let i = 0; i < parentCardStars.length; i++) {
+                        parentCardStars[i].classList.toggle('active', i < rating);
+                        parentCardStars[i].classList.toggle('text-yellow-400', i < rating);
+                        parentCardStars[i].classList.toggle('text-gray-300', i >= rating);
+                    }
+                    // Could do a full renderTravelIdeas() but direct update is faster.
+                }
+            }
+
+            regionButtonsEl.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentTravelRegion = btn.dataset.region;
+                    setActiveTravelRegion(currentTravelRegion);
+                    renderTravelIdeas();
+                });
+            });
+            renderTravelIdeas(); // Initial Render
+        })();
+
+        // Swipe-based Recommender
+        (function() {
+            const swipeItemsData = [ 
+                { id: 1, title: "Try a pottery class", image: `<svg class="w-full h-full object-cover rounded-lg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="250" fill="#d1c4e9" rx="8"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="18" fill="#4527a0">Pottery Class</text></svg>` },
+                { id: 2, title: "Go on a mystery picnic", image: `<svg class="w-full h-full object-cover rounded-lg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="250" fill="#c8e6c9" rx="8"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="18" fill="#2e7d32">Mystery Picnic</text></svg>` },
+                { id: 3, title: "Book a random flight weekend", image: `<svg class="w-full h-full object-cover rounded-lg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="250" fill="#bbdefb" rx="8"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="16" fill="#1565c0">Random Flight Weekend</text></svg>` },
+                { id: 4, title: "Visit a local museum", image: `<svg class="w-full h-full object-cover rounded-lg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="250" fill="#fff9c4" rx="8"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="18" fill="#f57f17">Local Museum</text></svg>` },
+                { id: 5, title: "Try an escape room", image: `<svg class="w-full h-full object-cover rounded-lg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="250" fill="#ffccbc" rx="8"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Poppins" font-size="18" fill="#d84315">Escape Room</text></svg>` }
+            ];
+            let currentSwipeItemIndex = 0;
+            const swipeContainerEl = document.getElementById('swipe-container');
+            const swipeLeftBtnEl = document.getElementById('swipe-left');
+            const swipeRightBtnEl = document.getElementById('swipe-right');
+
+            if (!swipeContainerEl || !swipeLeftBtnEl || !swipeRightBtnEl) {
+                console.warn("Swipe recommender elements not found, skipping initialization.");
+                return;
+            }
+
+            function createSwipeCard(item, index) {
+                const card = document.createElement('div');
+                // The swipe-card class is now global
+                card.className = 'swipe-card bg-white rounded-lg shadow-xl overflow-hidden p-6 flex flex-col justify-center items-center';
+                card.style.zIndex = swipeItemsData.length - index; 
+                // Initial position for stacking effect (only top card is fully visible and interactive)
+                card.style.transform = index === currentSwipeItemIndex ? 'translateX(0) scale(1)' : `translateX(0) scale(${1 - (index - currentSwipeItemIndex) * 0.05})`;
+                card.style.opacity = index === currentSwipeItemIndex ? '1' : `${1 - (index - currentSwipeItemIndex) * 0.2}`;
+                card.dataset.index = index; // Keep track of its original index
+
+                card.innerHTML = `
+                    <div class="w-full h-4/5 flex items-center justify-center">${item.image}</div>
+                    <h3 class="text-xl font-semibold mt-4 text-center text-gray-800">${item.title}</h3>`;
+                return card;
+            }
+            
+            function renderSwipeCards() {
+                swipeContainerEl.innerHTML = '';
+                if (currentSwipeItemIndex >= swipeItemsData.length) {
+                    swipeContainerEl.innerHTML = '<p class="text-gray-600 text-center p-4">No more ideas! Check back later.</p>';
+                    swipeLeftBtnEl.disabled = true;
+                    swipeRightBtnEl.disabled = true;
+                    return;
+                }
+
+                // Render current and next few cards for stacking appearance
+                const cardsToRender = swipeItemsData.slice(currentSwipeItemIndex, currentSwipeItemIndex + 3).reverse(); // Reverse for correct z-index stacking
+                cardsToRender.forEach((item) => {
+                    const originalIndex = swipeItemsData.indexOf(item); // Get original index for proper styling
+                    const card = createSwipeCard(item, originalIndex);
+                    swipeContainerEl.appendChild(card);
+                });
+
+                swipeLeftBtnEl.disabled = false;
+                swipeRightBtnEl.disabled = false;
+            }
+
+            function handleSwipeAction(direction) {
+                if (currentSwipeItemIndex >= swipeItemsData.length) return;
+                
+                const cardsInDOM = swipeContainerEl.querySelectorAll('.swipe-card');
+                const currentCardEl = Array.from(cardsInDOM).find(card => parseInt(card.dataset.index) === currentSwipeItemIndex);
+
+                if (currentCardEl) {
+                    currentCardEl.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                    const rotation = direction === 'right' ? 15 : -15;
+                    const translateX = direction === 'right' ? '150%' : '-150%';
+                    currentCardEl.style.transform = `translateX(${translateX}) rotate(${rotation}deg) scale(1.05)`;
+                    currentCardEl.style.opacity = '0';
+                    
+                    // swipeItemsData[currentSwipeItemIndex].liked = direction === 'right'; // Store user preference if needed
+                    
+                    setTimeout(() => {
+                        currentSwipeItemIndex++;
+                        renderSwipeCards(); 
+                    }, 300); // Slightly less than transition to avoid flicker
+                }
+            }
+
+            swipeLeftBtnEl.addEventListener('click', () => handleSwipeAction('left'));
+            swipeRightBtnEl.addEventListener('click', () => handleSwipeAction('right'));
+
+            renderSwipeCards(); // Initial render
+        })();
+
+        // Gift Idea Generator
+        (function() {
+            const allGiftIdeasData = [
+                { id:1, name: "Smart Water Bottle", occasions: ["birthday", "holiday", "graduation"], tags: ["tech", "health", "outdoors"], image: `<svg viewBox="0 0 100 100" class="w-full h-32 object-contain mb-2 rounded"><rect width="100" height="100" fill="#e0f7fa" rx="4"/><text x="50" y="50" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="#00796b">Smart Bottle</text></svg>` },
+                { id:2, name: "Gourmet Coffee Set", occasions: ["birthday", "holiday", "anniversary"], tags: ["food", "home"], image: `<svg viewBox="0 0 100 100" class="w-full h-32 object-contain mb-2 rounded"><rect width="100" height="100" fill="#fbe9e7" rx="4"/><text x="50" y="50" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="#d84315">Coffee Set</text></svg>` },
+                { id:3, name: "Personalized Star Map", occasions: ["anniversary", "wedding", "birthday"], tags: ["handmade", "home", "unique"], image: `<svg viewBox="0 0 100 100" class="w-full h-32 object-contain mb-2 rounded"><rect width="100" height="100" fill="#e8eaf6" rx="4"/><text x="50" y="50" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="#303f9f">Star Map</text></svg>` },
+                { id:4, name: "Succulent Plant Kit", occasions: ["birthday", "holiday", "graduation"], tags: ["home", "outdoors", "diy"], image: `<svg viewBox="0 0 100 100" class="w-full h-32 object-contain mb-2 rounded"><rect width="100" height="100" fill="#f1f8e9" rx="4"/><text x="50" y="50" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="#558b2f">Plant Kit</text></svg>` },
+                { id:5, name: "Online Course Subscription", occasions: ["graduation", "birthday", "holiday"], tags: ["experience", "tech", "education"], image: `<svg viewBox="0 0 100 100" class="w-full h-32 object-contain mb-2 rounded"><rect width="100" height="100" fill="#e3f2fd" rx="4"/><text x="50" y="50" dominant-baseline="middle" text-anchor="middle" font-size="8" fill="#1565c0">Online Course Sub</text></svg>` },
+                { id:6, name: "Board Game Collection", occasions: ["holiday", "birthday"], tags: ["home", "social"], image: `<svg viewBox="0 0 100 100" class="w-full h-32 object-contain mb-2 rounded"><rect width="100" height="100" fill="#fffde7" rx="4"/><text x="50" y="50" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="#f57f17">Board Games</text></svg>` }
+            ];
+            const giftResultsContainerEl = document.getElementById('gift-results');
+            const occasionButtonsContainerEl = document.getElementById('occasion-select-buttons');
+            const tagsButtonsContainerEl = document.getElementById('gift-tags-buttons');
+            const generateGiftBtnEl = document.getElementById('generate-gift');
+
+            if (!giftResultsContainerEl || !occasionButtonsContainerEl || !tagsButtonsContainerEl || !generateGiftBtnEl) {
+                console.warn("Gift generator elements not found, skipping initialization.");
+                return;
+            }
+
+            let selectedGiftOccasion = "all";
+            let selectedGiftTags = [];
+
+            function renderGiftIdeas() {
+                giftResultsContainerEl.innerHTML = '';
+                const filteredIdeas = allGiftIdeasData.filter(idea => {
+                    const occasionMatch = selectedGiftOccasion === "all" || idea.occasions.includes(selectedGiftOccasion);
+                    const tagsMatch = selectedGiftTags.length === 0 || selectedGiftTags.every(tag => idea.tags.includes(tag));
+                    return occasionMatch && tagsMatch;
+                });
+
+                if (filteredIdeas.length === 0) {
+                    giftResultsContainerEl.innerHTML = '<p class="col-span-full text-center text-gray-500">No gift ideas match your criteria. Try broadening your search!</p>';
+                    return;
+                }
+
+                filteredIdeas.forEach(gift => {
+                    const div = document.createElement('div');
+                    div.className = 'card bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col items-center text-center';
+                    div.innerHTML = `
+                        <div class="w-full h-32 mb-2">${gift.image}</div>
+                        <h4 class="font-semibold text-gray-800 mt-2 text-sm">${gift.name}</h4>
+                        <div class="mt-2 flex flex-wrap justify-center gap-1">
+                            ${gift.tags.map(tag => `<span class="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full capitalize">${tag}</span>`).join('')}
+                        </div>
+                    `;
+                    giftResultsContainerEl.appendChild(div);
+                });
+            }
+            
+            occasionButtonsContainerEl.querySelectorAll('.occasion-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    occasionButtonsContainerEl.querySelector('.active').classList.remove('active');
+                    btn.classList.add('active');
+                    selectedGiftOccasion = btn.dataset.occasion;
+                });
+            });
+
+            tagsButtonsContainerEl.querySelectorAll('.gift-tag').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tag = btn.dataset.tag;
+                    if (tag === "all") {
+                        selectedGiftTags = [];
+                        tagsButtonsContainerEl.querySelectorAll('.gift-tag.selected').forEach(t => t.classList.remove('selected'));
+                        btn.classList.add('selected'); // Keep 'All Tags' selected
+                    } else {
+                        tagsButtonsContainerEl.querySelector('.gift-tag[data-tag="all"]').classList.remove('selected');
+                        btn.classList.toggle('selected');
+                        if (selectedGiftTags.includes(tag)) {
+                            selectedGiftTags = selectedGiftTags.filter(t => t !== tag);
+                        } else {
+                            selectedGiftTags.push(tag);
+                        }
+                        // If no specific tags are selected, make "All Tags" active again
+                        if (selectedGiftTags.length === 0) {
+                            tagsButtonsContainerEl.querySelector('.gift-tag[data-tag="all"]').classList.add('selected');
+                        }
+                    }
+                });
+            });
+
+            generateGiftBtnEl.addEventListener('click', renderGiftIdeas);
+            renderGiftIdeas(); // Initial render based on default "all" filters
+        })();
+
+        // Visual Overlap Map
+        (function() {
+            const userRecsListEl = document.getElementById('your-recs-list');
+            const friendRecsListEl = document.getElementById('friend-recs-list');
+            const overlapRecsListEl = document.getElementById('overlap-recs-list');
+
+            if (!userRecsListEl || !friendRecsListEl || !overlapRecsListEl) {
+                console.warn("Overlap map list elements not found, skipping initialization.");
+                return;
+            }
+
+            const userRecsData = ["Paris", "Kyoto", "New York City", "Rome", "Berlin"];
+            const friendRecsData = ["Kyoto", "Sydney", "Rio de Janeiro", "Rome", "Barcelona", "Paris"];
+            const overlapData = userRecsData.filter(rec => friendRecsData.includes(rec));
+
+            function populateOverlapList(ulElement, items) {
+                ulElement.innerHTML = ''; 
+                if (items.length === 0) {
+                    ulElement.innerHTML = '<li class="text-gray-500 italic p-2">No items</li>';
+                    return;
+                }
+                items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'p-2 bg-white/80 rounded mb-1 text-sm text-gray-800 shadow-sm';
+                    li.textContent = item;
+                    ulElement.appendChild(li);
+                });
+            }
+
+            populateOverlapList(userRecsListEl, userRecsData);
+            populateOverlapList(friendRecsListEl, friendRecsData);
+            populateOverlapList(overlapRecsListEl, overlapData);
+        })();
+
+        // Outfit Builder
+        (function() {
+            const clothingItemsDb = [
+              { id: 1, name: "Blue Jacket", category: "Outerwear", image: `<svg width="100%" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#3b82f6" rx="8"/><text x="50" y="55" font-family="Poppins" font-size="10" fill="white" text-anchor="middle">Blue Jacket</text></svg>` },
+              { id: 2, name: "Black Pants", category: "Bottom", image: `<svg width="100%" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#1f2937" rx="8"/><text x="50" y="55" font-family="Poppins" font-size="10" fill="white" text-anchor="middle">Black Pants</text></svg>` },
+              { id: 3, name: "White T-Shirt", category: "Top", image: `<svg width="100%" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#f3f4f6" rx="8"/><text x="50" y="55" font-family="Poppins" font-size="10" fill="#374151" text-anchor="middle">White T-Shirt</text></svg>` },
+              { id: 4, name: "Red Sneakers", category: "Shoes", image: `<svg width="100%" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#ef4444" rx="8"/><text x="50" y="55" font-family="Poppins" font-size="10" fill="white" text-anchor="middle">Red Sneakers</text></svg>` },
+              { id: 5, name: "Denim Shorts", category: "Bottom", image: `<svg width="100%" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#60a5fa" rx="8"/><text x="50" y="55" font-family="Poppins" font-size="10" fill="white" text-anchor="middle">Denim Shorts</text></svg>` },
+              { id: 6, name: "Sun Hat", category: "Accessory", image: `<svg width="100%" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#fcd34d" rx="8"/><text x="50" y="55" font-family="Poppins" font-size="10" fill="#b45309" text-anchor="middle">Sun Hat</text></svg>` }
+            ];
+
+            const clothingContainerEl = document.getElementById("clothing-items");
+            const outfitDropContainerEl = document.getElementById("outfit-container"); 
+            const outfitMessageEl = document.getElementById("outfit-message");
+            const outfitScoreElSpan = document.getElementById("outfit-score");
+
+            if (!clothingContainerEl || !outfitDropContainerEl || !outfitMessageEl || !outfitScoreElSpan) {
+                console.warn("Outfit builder elements not found, skipping initialization.");
+                return;
+            }
+
+            function renderClothingItems() {
+              clothingContainerEl.innerHTML = ''; 
+              clothingItemsDb.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "outfit-item border border-gray-200 hover:shadow-md transition-shadow"; 
+                div.draggable = true;
+                div.dataset.id = item.id;
+                div.innerHTML = `
+                  <div class="w-full h-24 flex items-center justify-center p-1">${item.image}</div>
+                  <p class="mt-1 text-xs font-medium text-gray-700 p-1">${item.name}</p> 
+                `;
+                div.addEventListener("dragstart", handleDragStartOutfitItem);
+                div.addEventListener("dragend", handleDragEndOutfitItem);
+                clothingContainerEl.appendChild(div);
+              });
+            }
+
+            function handleDragStartOutfitItem(e) {
+              e.dataTransfer.setData("text/plain", e.currentTarget.dataset.id);
+              e.dataTransfer.effectAllowed = "move";
+              e.currentTarget.classList.add("dragging");
+            }
+            
+            function handleDragEndOutfitItem(e) {
+                e.currentTarget.classList.remove("dragging");
+            }
+
+            outfitDropContainerEl.addEventListener("dragover", e => {
+              e.preventDefault(); 
+              e.dataTransfer.dropEffect = "move";
+              outfitDropContainerEl.classList.add("drag-over");
+              if (outfitMessageEl) outfitMessageEl.style.display = 'none';
+            });
+
+            outfitDropContainerEl.addEventListener("dragleave", () => {
+              outfitDropContainerEl.classList.remove("drag-over");
+              if (outfitMessageEl && outfitDropContainerEl.children.length === 0) {
+                  outfitMessageEl.style.display = 'block';
+              }
+            });
+
+            outfitDropContainerEl.addEventListener("drop", e => {
+              e.preventDefault();
+              outfitDropContainerEl.classList.remove("drag-over");
+              const itemId = e.dataTransfer.getData("text/plain");
+              const itemData = clothingItemsDb.find(i => i.id == itemId);
+
+              if (itemData) {
+                // Optional: Prevent adding the same item multiple times
+                // if (outfitDropContainerEl.querySelector(`.outfit-item[data-id="${itemData.id}"]`)) {
+                //     alert("Item already in outfit!"); return;
+                // }
+                const itemDiv = document.createElement("div");
+                itemDiv.className = "outfit-item bg-gray-100 border border-gray-300"; 
+                itemDiv.dataset.id = itemData.id;
+                itemDiv.dataset.category = itemData.category;
+
+                itemDiv.innerHTML = `
+                  <div class="w-full h-24 flex items-center justify-center p-1">${itemData.image}</div>
+                  <p class="mt-1 text-xs text-gray-600 p-1">${itemData.name}</p>
+                `;
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '&times;'; // Multiplication sign for 'x'
+                removeBtn.className = 'absolute top-0.5 right-0.5 text-red-500 hover:text-red-700 text-sm leading-none p-0.5 bg-white/50 rounded-full';
+                removeBtn.setAttribute('aria-label', 'Remove item');
+                removeBtn.onclick = () => {
+                    itemDiv.remove();
+                    updateOutfitScore();
+                    if (outfitMessageEl && outfitDropContainerEl.children.length === 0) {
+                        outfitMessageEl.style.display = 'block';
+                    }
+                };
+                itemDiv.appendChild(removeBtn);
+                outfitDropContainerEl.appendChild(itemDiv);
+                if (outfitMessageEl) outfitMessageEl.style.display = 'none';
+                updateOutfitScore();
+              }
+            });
+
+            function updateOutfitScore() {
+              const itemsInOutfit = outfitDropContainerEl.querySelectorAll(".outfit-item");
+              const count = itemsInOutfit.length;
+              let score = 0;
+              const categoriesPresent = new Set();
+              itemsInOutfit.forEach(item => categoriesPresent.add(item.dataset.category));
+
+              // Scoring logic: 10 points per item, bonus 10 for each unique category up to 4. Max 100.
+              score = count * 10;
+              score += Math.min(categoriesPresent.size, 4) * 10; 
+              score = Math.min(score, 100);
+              
+              outfitScoreElSpan.textContent = score;
+            }
+            
+            // Initial setup for outfit builder
+            renderClothingItems();
+            updateOutfitScore(); 
+            if (outfitMessageEl && outfitDropContainerEl.children.length === 0) {
+                outfitMessageEl.style.display = 'block';
+            } else if (outfitMessageEl) {
+                outfitMessageEl.style.display = 'none';
+            }
+        })();
+
+    </script>
+</body>
+</html>
